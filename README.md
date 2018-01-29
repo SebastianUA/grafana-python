@@ -6,7 +6,7 @@
 To get a help, run:
  ```$ python3 grafana_dashboards_without_git.py -h```
 
- Examples:
+ Example:
  ```
  usage: python3 script_name.py {ARGS}
 
@@ -40,3 +40,14 @@ $ python3 grafana_dashboards_without_git.py --gtoken YOUR_GRAFANA_TOKEN --gurl Y
 ```
 $ python3 grafana_dashboards_without_git.py --gtoken YOUR_GRAFANA_TOKEN --gurl YOUR_GRAFANA_URL --i
 ```
+
+Authors
+=======
+
+Created and maintained by [Vitaliy Natarov](https://github.com/SebastianUA)
+(vitaliy.natarov@yahoo.com).
+
+License
+=======
+
+Apache 2 Licensed. See LICENSE for full details.
