@@ -1,7 +1,7 @@
-#  Work with zabbix templates (export and import)
+#  Work with grafana dashboadrs (export and import)
 -------------------------------------------------
 
-##Usage
+## Usage
 
 To get a help, run:
  ```$ python3 grafana_dashboards_without_git.py -h```
