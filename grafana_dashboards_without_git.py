@@ -7,10 +7,9 @@ import os
 import argparse
 import json
 import glob
-import gitlab
 
-from datetime import datetime
-# from sys import exit
+# from datetime import datetime
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 
 class Bgcolors:
@@ -41,8 +40,9 @@ def get_grafana_dashboards(g_url, g_token):
 
 
 def export_grafana_dashboards(g_token, g_url, dir_path, e_dash):
-
-    headers = {'Authorization': str('Bearer ' + g_token), 'Content-type': 'application/json'}
+    headers = {'Authorization': str('Bearer ' + g_token),
+               'Content-type': 'application/json'
+               }
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
         print(dir_path, 'has been created')
@@ -85,8 +85,10 @@ def export_grafana_dashboards(g_token, g_url, dir_path, e_dash):
 
 
 def import_grafana_dashboards(g_token, g_url, dir_path, i_dash):
-
-    headers = {'Authorization': str('Bearer ' + g_token), 'Content-type': 'application/json'}
+    headers = {'Authorization': str('Bearer ' + g_token),
+               'Content-type': 'application/json',
+               'Accept': 'application/json'
+               }
     dash_count = 1
 
     if i_dash == 'all':
@@ -97,13 +99,29 @@ def import_grafana_dashboards(g_token, g_url, dir_path, i_dash):
         for d in i_dash:
             files = glob.glob(str(dir_path) + "/" + str(d) + ".json")
     for f in files:
+        d = f.split('.')[0].split('/')[1]
+
         with open(f, 'r') as file:
             dashboard = file.read()
             try:
                 print('[%s] Need to create an import to grafana [%s]' % (dash_count, f))
                 datas = json.loads(dashboard)
-                I_Dash = requests.post(g_url +'/api/dashboards/db/', headers=headers, json=datas)
-                print(I_Dash)
+
+                protocol = g_url.split(':')[0]
+                if protocol == "http":
+                    i__dash = requests.post(g_url + '/api/dashboards/db/', headers=headers, json=datas)
+                elif protocol == "https":
+                    verify = False
+                    if not verify:
+                        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+                    i__dash = requests.post(g_url + '/api/dashboards/db/', headers=headers, json=datas, verify=verify)
+                    if i__dash.status_code != 200:
+                        print(i__dash.status_code)
+                        exit(0)
+                else:
+                    print('Incorrect URL! Use url with http|https protocol')
+                    exit(0)
+                print(i__dash)
             except EOFError as e:
                 print(e)
         dash_count += 1
@@ -112,7 +130,6 @@ def import_grafana_dashboards(g_token, g_url, dir_path, i_dash):
 
 
 def main():
-
     start__time = time.time()
     parser = argparse.ArgumentParser(prog='python3 script_name.py -h',
                                      usage='python3 script_name.py {ARGS}',
